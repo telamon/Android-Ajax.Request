@@ -154,7 +154,7 @@ Creates a StringEntity from your data and sets it to be sent with the request.
 #### note
 As of this moment there's no sophisticated string content type detection.
 The only case that setStringParams() modifies the "Content-Type" header
-is when the string begins with '<?xml'.
+is when the string begins with __'<?xml'__.
 
 Yes this might seem like a design flaw and might trigger the "setParams calls modified
 my Content-Type header when I've already set it manually"-problem.
@@ -230,16 +230,16 @@ Pull parse the XML-data
 	
 Build a DOM
 
-	Document doc = transport.getResponseXml();
+	org.w3c.dom.Document doc = transport.getResponseXml();
 	// Or cut right to the cheese and grab the desired nodes with:
-	NodeList fantasyBooks = transport.findByXpath("/bookstore/books[@category='fantasy']");
+	org.w3c.dom.NodeList fantasyBooks = transport.findByXpath("/bookstore/books[@category='fantasy']");
 
 This is the most memory consuming way, getResponseXml() holds a local cache to the Document
 once built, so the node tree is only built once.
 If the response data is malformed or fails to be parsed this method returns __null__
   
 
-For more info on work with Push/Pull/DOM parsers see: 
+For more info on working with Push/Pull/DOM parsers see: 
  http://developer.android.com/reference/org/xmlpull/v1/XmlPullParser.html
 
 	

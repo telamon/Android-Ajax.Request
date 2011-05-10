@@ -12,20 +12,21 @@ Features
 * Built on top of AsyncTask to ensure that your callback code runs on the UI thread.
 * Provides general lazyness.
 * Failsafe? (No guarantees yet)
+
 ### TODO
+
 * JSON Header support
 * More ways to handle XML post data?
 * Rails authenticity token handling for "application/x-www-form-urlencoded" postdata
 
 Requesting Things (The Request class)
-=================================
+-------------------------------------
 
 
-Example usage
---------------
+### Example usage
 Include the library in whatever fashion you desire
 
-### Simple GET request
+#### Simple GET request
 
 	Request r = new Request("http://mydomain.org/service/service.json"){
 		@Override
@@ -39,7 +40,7 @@ Include the library in whatever fashion you desire
 		}					
 	}.execute("GET");	
 					
-### Simple POST request
+#### Simple POST request
 
 	Request r = new Request("http://mydomain.org/service/highscore"){
 		@Override
@@ -63,20 +64,24 @@ Include the library in whatever fashion you desire
 	r.execute("POST","{ \"name\" : \"MrMan\", \"score\" : 9001 }");
 	
 	
-Headers
--------
+### Headers
 You can set whatever HTTPHeader you like but they must be set _before_ the execute() call.
+
 	request.setHeader("If-Modified-Since", "Tue, 10 May 2011 11:31:56 GMT")
 
 There are a few shortcuts like
+
 	request.accept("text/plain"); // Modifies the 'Accept' header
 	setContentType("application/json");	 // Modifies the 'Content-Type' header
 
-Parameters
-----------
+### Parameters
+
 You can easily set POST or PUT data by calling
+
 	r.setParams(myBadAssObject)
+
 or provide your data as the second parameter to execute, eg: 
+
 	r.execute("POST",myKewlObject)
 
 setParams(Object) method tries to automatically determine the type of content you're
@@ -84,27 +89,29 @@ trying to send, and automatically sets the Content-Type header accordingly.
 
 The detected data is then delegated to one of the following methods:
 	
-### setFormParams(String[][])
+	### setFormParams(String[][])
+	
 Converts your data to an UrlEncodedFormEntity and calls setContent(CTYPE_FORM).
 usage:
+
 	setFormParams(new String[][]{
 		{"foo","bar"},
 		{"eat","bacon"}
 	});
 	
-### setFormParams(HashMap<?, ?>)
+	#### setFormParams(HashMap<?, ?>)
 Does the same as above except it takes an hashmap as input and ultimately calls
 toString() on each key / value.
 
-### setJsonParams(org.json.JSONObject)
+	#### setJsonParams(org.json.JSONObject)
 Sets Content-Type header to application/json.
 Converts your JSONObject to a String and then delegates your data to setStringParams()
 	 	
-###	setXmlParams(org.w3c.dom.Document)
+	####	setXmlParams(org.w3c.dom.Document)
 Sets Content-Type header to application/xml,
 Converts your Xml Document to a String and then delegates your data to setStringParams()
 	
-### setStringParams(String)
+	#### setStringParams(String)
 Creates a StringEntity from your data and sets it to be sent with the request.
 	
 _note_

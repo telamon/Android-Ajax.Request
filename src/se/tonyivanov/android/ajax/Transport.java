@@ -108,12 +108,12 @@ public class Transport {
 			return null;
 		}
 	}
+	
 	public Document getResponseXml(){
 		if(responseXml == null){
 			if(!contentType.equalsIgnoreCase(Request.CTYPE_XML)){
 				Log.w("Ajax.Request", "Trying to parse XML from response with type: "+contentType);
 			}
-	
 			try {
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder builder;
@@ -129,6 +129,7 @@ public class Transport {
 		}
 		return responseXml;
 	}
+	
 	/**
 	 * Helper method to find nodes by XPath in XML responses.
 	 * 

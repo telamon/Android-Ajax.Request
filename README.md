@@ -88,33 +88,41 @@ setParams(Object) method tries to automatically determine the type of content yo
 trying to send, and automatically sets the Content-Type header accordingly.
 
 The detected data is then delegated to one of the following methods:
-	
-	### setFormParams(String[][])
-	
-Converts your data to an UrlEncodedFormEntity and calls setContent(CTYPE_FORM).
-usage:
+
+#### Urlencoded form 
 
 	setFormParams(new String[][]{
 		{"foo","bar"},
 		{"eat","bacon"}
 	});
 	
-	#### setFormParams(HashMap<?, ?>)
+Converts your data to an UrlEncodedFormEntity and calls setContent(CTYPE_FORM).
+usage:
+
+
+	
+	setFormParams(HashMap<?, ?>)
 Does the same as above except it takes an hashmap as input and ultimately calls
 toString() on each key / value.
 
-	#### setJsonParams(org.json.JSONObject)
+#### JSON
+
+	setJsonParams(org.json.JSONObject)
 Sets Content-Type header to application/json.
 Converts your JSONObject to a String and then delegates your data to setStringParams()
+
+#### XML
 	 	
-	####	setXmlParams(org.w3c.dom.Document)
+	setXmlParams(org.w3c.dom.Document)
 Sets Content-Type header to application/xml,
 Converts your Xml Document to a String and then delegates your data to setStringParams()
+
+#### Plain text
 	
-	#### setStringParams(String)
+	setStringParams(String)
 Creates a StringEntity from your data and sets it to be sent with the request.
 	
-_note_
+#### note
 As of this moment there's no sophisticated string content type detection.
 The only case that setStringParams() modifies the "Content-Type" header
 is when the string begins with '<?xml'.

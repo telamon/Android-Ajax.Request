@@ -37,7 +37,7 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public abstract class Request extends AsyncTask<Object,Void,Transport> {
+public class Request extends AsyncTask<Object,Void,Transport> {
 	// Redundant Constants probably already defined at other places.
 	public final static String GET ="GET";
 	public final static String POST ="POST";
@@ -60,7 +60,7 @@ public abstract class Request extends AsyncTask<Object,Void,Transport> {
 	
 	private String url;
 	private HttpEntity params;
-
+	private IOException lastError;
 
 	
 	public Request(String url){
@@ -105,15 +105,66 @@ public abstract class Request extends AsyncTask<Object,Void,Transport> {
 			transport = new Transport(client.execute(request));
 			
 		} catch (IOException e) {
+			lastError = e;
 			e.printStackTrace();
 		}	
 		return transport;
 	}
 	protected void onPostExecute(Transport transport){
-		onComplete(transport);
+		if(lastError == null){
+			if(transport.getStatus() < 400){
+				onSuccess(transport);
+			}else{
+				onFailure(transport);
+			}
+			onComplete(transport);			
+		}else{
+			onError(lastError);
+		}
+		
 	}
-	protected abstract void onComplete(Transport transport);
-
+	
+	/** 
+	 * 	This callback gets executed when a request completes
+	 * 	disregarding of http response code.
+	 *  Override this method during instantiation
+	 *  to add onComplete handling.
+	 * @param transport Response data
+	 */
+	protected void onComplete(Transport transport){
+		
+	}
+	/** 
+	 * 	This callback gets executed when an IOException
+	 *  is thrown.
+	 *  Override this method during instantiation
+	 *  to add onError handling.
+	 * @param ex Thrown IOException.
+	 */	
+	protected void onError(IOException ex){
+		
+	}
+	
+	/** 
+	 * 	This callback gets executed when a request succeeds
+	 * 	(http responce code < 400)
+	 *  Override this method during instantiation
+	 *  to add onSuccess handling.
+	 * @param transport Response data
+	 */	
+	protected void onSuccess(Transport transport){
+		
+	}
+	/** 
+	 * 	This callback gets executed when a request fails
+	 * 	(http responce code >= 400)
+	 *  Override this method during instantiation
+	 *  to add onFailure handling.
+	 * @param transport Response data
+	 */	
+	protected void onFailure(Transport transport){
+		
+	}
 	
 	/**
 	 *  Auto-identifies parameters and serializes into compatible format.
@@ -230,6 +281,8 @@ public abstract class Request extends AsyncTask<Object,Void,Transport> {
 		setHeader("Accept",contentType);
 		return this;
 	}
+
+	
 	
 	
 }

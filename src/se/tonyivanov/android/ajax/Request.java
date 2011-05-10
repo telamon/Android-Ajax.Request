@@ -1,5 +1,7 @@
 package se.tonyivanov.android.ajax;
-
+/*
+ * @author TonyIvanov (telamohn@gmail.com) 
+ */
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

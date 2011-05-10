@@ -1,4 +1,7 @@
 package se.tonyivanov.android.ajax;
+/*
+ * @author TonyIvanov (telamohn@gmail.com) 
+ */
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -127,20 +130,21 @@ public class Transport {
 		return responseXml;
 	}
 	/**
+	 * Helper method to find nodes by XPath in XML responses.
+	 * 
 	 * WARNING: Use this method with care! First off, it calls getResponseXml
 	 * which in effect builds a searchable Document that can hog up ALOT of memory
 	 * if used carelessly. 
 	 * Second, this method fails if getResponseXml fails to parse responseText as XML.
-	 * End Of Warning
-	 * 
-	 * Helper method to find nodes by XPath in XML responses.
 	 * 
 	 * @param expression A valid XPath expression see http://developer.android.com/reference/javax/xml/xpath/package-summary.html for more info.
 	 * @return NodeList An Array containing nodes that match your expression.
 	 * @throws XPathExpressionException 
 	 */
+	
 	public NodeList findByXpath(String expression) throws XPathExpressionException{
 		if(getResponseXml() == null){
+			// let's do something forbidden.
 			throw new XPathExpressionException("There is no parsable XML in the response.");
 		}
 		XPath xpath = XPathFactory.newInstance().newXPath();

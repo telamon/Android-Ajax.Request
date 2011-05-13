@@ -36,6 +36,14 @@ public class Transport {
 	
 	private String contentEncoding;
 	private long contentLength;
+	
+	/**
+	 * Reads input stream into a string and calls consume content.
+	 * Not very smart incase of a binary object.
+	 * @param resp
+	 * @throws IllegalStateException
+	 * @throws IOException
+	 */
 	public Transport(HttpResponse resp) throws IllegalStateException, IOException{
 		response = resp;
 		if(response.getEntity().getContentType() !=null){
@@ -46,33 +54,28 @@ public class Transport {
 		if(response.getEntity().getContentEncoding() !=null){
 			contentEncoding = response.getEntity().getContentEncoding().getValue();
 		}else{
-			contentEncoding = "UTF-8";
+			contentEncoding = "UTF-8"; // used internally for toString()
 		}
 		
 		contentLength = response.getEntity().getContentLength();		
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		/*InputStream content = response.getEntity().getContent();
-		int b=0;
-		while((b = content.read())!= -1){
-			baos.write(b);
-		}*/
+//		InputStream content = response.getEntity().getContent();
+//		int b=0;
+//		while((b = content.read())!= -1){
+//			baos.write(b);
+//		}
 		response.getEntity().writeTo(baos);
 		
-		responseText = baos.toString("UTF-8");
+		responseText = baos.toString(contentEncoding);
 		
 		response.getEntity().consumeContent();
-		if(contentType.equalsIgnoreCase(Request.CTYPE_JSON)){
-			try {
-				responseJson = new JSONObject(responseText);
-			} catch (JSONException e) {				
-				e.printStackTrace();
-			}
-		}else
-		if(contentType.equalsIgnoreCase(Request.CTYPE_XML)){
-			
-		}
+
 	}
+	/**
+	 * Returns the original response object.
+	 * @return httpResponse - might be consumed.
+	 */
 	public HttpResponse getResponse() {
 		return response;
 	}
@@ -153,6 +156,16 @@ public class Transport {
 	}
 	
 	public JSONObject getResponseJson(){
+		if(responseJson == null){
+			if(contentType.equalsIgnoreCase(Request.CTYPE_JSON)){
+				
+			}
+			try {
+				responseJson = new JSONObject(responseText);
+			} catch (JSONException e) {				
+				e.printStackTrace();
+			}		
+		}
 		return responseJson;	
 	}
 	public int getStatus(){

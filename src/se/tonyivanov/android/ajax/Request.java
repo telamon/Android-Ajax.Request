@@ -27,13 +27,16 @@ import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 
-import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -52,7 +55,7 @@ public class Request extends AsyncTask<Object,Void,Transport> {
 	public final static String CTYPE_PLAIN = "text/plain";	
 	
 	private HashMap<String,String> headers;
-	AndroidHttpClient client;
+	//private static AndroidHttpClient client;
 	BasicHttpContext context;
 	private String method; 
 	HttpRequestBase request;
@@ -64,11 +67,31 @@ public class Request extends AsyncTask<Object,Void,Transport> {
 
 	
 	public Request(String url){
-		context= new BasicHttpContext();		
-		client = AndroidHttpClient.newInstance("se.tonyivanov.android.ajax.Request");
+		context= new BasicHttpContext();
+//		if(client==null){
+//			client = AndroidHttpClient.newInstance("se.tonyivanov.android.ajax.Request");
+//		}
 		this.url = url;
 		headers = new HashMap<String,String>();
 		headers.put("Accept",CTYPE_JSON);
+	}
+	
+	/**
+	 * Returns a threadsafe client.
+	 * Courtesy of Jason Hudgins (http://foo.jasonhudgins.com/2010/03/http-connections-revisited.html)
+	 * @return
+	 */
+	public static DefaultHttpClient getThreadSafeClient() {
+
+	    DefaultHttpClient client = new DefaultHttpClient();
+	    ClientConnectionManager mgr = client.getConnectionManager();
+	    HttpParams params = client.getParams();
+
+	    client = new DefaultHttpClient(
+	        new ThreadSafeClientConnManager(params,
+	            mgr.getSchemeRegistry()), params);
+
+	    return client;
 	}
 	
 	@Override
@@ -102,8 +125,8 @@ public class Request extends AsyncTask<Object,Void,Transport> {
 		}
 		
 		try {
-			transport = new Transport(client.execute(request));
-			
+			transport = new Transport(getThreadSafeClient().execute(request));
+			//client.close();
 		} catch (IOException e) {
 			lastError = e;
 			e.printStackTrace();
@@ -112,7 +135,7 @@ public class Request extends AsyncTask<Object,Void,Transport> {
 	}
 	protected void onPostExecute(Transport transport){
 		if(lastError == null){
-			if(transport.getStatus() < 400){
+			if(transport.getStatus() < 300 && transport.getStatus() >= 200){				
 				onSuccess(transport);
 			}else{
 				onFailure(transport);
@@ -121,7 +144,6 @@ public class Request extends AsyncTask<Object,Void,Transport> {
 		}else{
 			onError(lastError);
 		}
-		
 	}
 	
 	/** 

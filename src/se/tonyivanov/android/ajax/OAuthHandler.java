@@ -1,5 +1,7 @@
 package se.tonyivanov.android.ajax;
 
+import java.io.Serializable;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +16,11 @@ import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 
-public class OAuthHandler {
+public class OAuthHandler implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 609663171140088815L;
 	private OAuthConsumer consumer;
 	private OAuthProvider provider;
 	private String verificationCode=null;
@@ -30,6 +36,9 @@ public class OAuthHandler {
 		consumer = new CommonsHttpOAuthConsumer(app_id,app_key);
 		provider = new CommonsHttpOAuthProvider(requestPath,accessPath,authorizePath);
 		
+	}
+	public OAuthConsumer getConsumer(){
+		return consumer;
 	}
 	public String getAppCallback(Context appContext){
 		return "oauth://"+appContext.getClass().getName()+"/callback";
@@ -50,6 +59,7 @@ public class OAuthHandler {
 		verificationCode = data.getQueryParameter("oauth_verifier");
 		Log.i("Ajax.OAuth", "VERIFICATION AQUIRED:" + verificationCode);
 		try {
+		
 			provider.retrieveAccessToken(consumer,verificationCode);
 			Log.i("Ajax.OAuth", "ACCESS TOKEN AQUIRED!");
 		} catch (OAuthMessageSignerException e) {
@@ -78,5 +88,20 @@ public class OAuthHandler {
 				e.printStackTrace();
 			}
         }
+	}
+	public void sign(Request request) {
+		try {
+			consumer.sign(request.getHttpRequest());
+		} catch (OAuthMessageSignerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (OAuthExpectationFailedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (OAuthCommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 }

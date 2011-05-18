@@ -64,7 +64,9 @@ public class Request extends AsyncTask<Object,Void,Transport> {
 	private String url;
 	private HttpEntity params;
 	private IOException lastError;
-
+	protected HttpRequestBase getHttpRequest(){
+		return request;
+	}
 	
 	public Request(String url){
 		context= new BasicHttpContext();
